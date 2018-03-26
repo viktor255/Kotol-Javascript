@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/kotol');
+// mongoose.connect('mongodb://localhost:27017/kotol');
+mongoose.connect('mongodb://viktor:viktor-bojler@boilertimeconfigs-shard-00-00-ssig8.mongodb.net:27017,boilertimeconfigs-shard-00-01-ssig8.mongodb.net:27017,boilertimeconfigs-shard-00-02-ssig8.mongodb.net:27017/kotol?ssl=true&replicaSet=boilerTimeConfigs-shard-0&authSource=admin');
 
 var TimeConfig = require('./models/timeConfig');
 
@@ -28,8 +29,10 @@ function printInfo(){
 function updateNextConfig(){
     TimeConfig.find({time: {$gt: currentTime }}).sort({time:1}).exec(function (err, timeConfigs) {
         if (err) throw err;
-        nextTime = timeConfigs[0].time;
-        nextTemp = timeConfigs[0].temperature;
+        if(timeConfigs.length > 0 ) {
+            nextTime = timeConfigs[0].time;
+            nextTemp = timeConfigs[0].temperature;
+        }
         printInfo();
     });
 }
@@ -37,13 +40,17 @@ function updateNextConfig(){
 function temperatureInit(){
     TimeConfig.find({time: {$lt: currentTime }}).sort({time:-1}).exec(function (err, timeConfigs) {
         if (err) throw err;
-        lastTime = timeConfigs[0].time;
-        currentTemp = timeConfigs[0].temperature;
+        if(timeConfigs.length > 0 ) {
+            lastTime = timeConfigs[0].time;
+            currentTemp = timeConfigs[0].temperature;
+        }
     });
     TimeConfig.find({time: {$gte: currentTime }}).sort({time:1}).exec(function (err, timeConfigs) {
         if (err) throw err;
-        nextTime = timeConfigs[0].time;
-        nextTemp = timeConfigs[0].temperature;
+        if(timeConfigs.length > 0 ) {
+            nextTime = timeConfigs[0].time;
+            nextTemp = timeConfigs[0].temperature;
+        }
     });
 }
 
