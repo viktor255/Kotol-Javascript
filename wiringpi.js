@@ -1,7 +1,7 @@
 var wiringpi = require('wiring-pi');
 
 // # use 'GPIO naming'
-wiringpi.wiringPiSetupGpio();
+wiringpi.setup('gpio');
 
 // # set #18 to be a PWM output
 wiringpi.pinMode(18, wiringpi.PWM_OUTPUT);
