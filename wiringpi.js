@@ -1,4 +1,5 @@
-var wiringpi = require('wiring-pi');
+var wiringpi = require('wiringpi-node');
+// var wiringpi = require('wiring-pi');
 
 // # use 'GPIO naming'
 wiringpi.setup('gpio');
