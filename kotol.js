@@ -5,6 +5,8 @@ mongoose.connect('mongodb://viktor:viktor-bojler@boilertimeconfigs-shard-00-00-s
 
 var TimeConfig = require('./models/timeConfig');
 
+
+// wiringpi start
 var wiringpi = require('wiringpi-node');
 // var wiringpi = require('wiring-pi');
 
@@ -33,6 +35,8 @@ function writeNumber(angle) {
     wiringpi.pwmWrite(18, angle);
     currentAngle = angle;
 }
+
+// wiringpi end
 
 
 var currentTime;
@@ -109,6 +113,7 @@ function everyMinute(){
 
 }
 
+writeNumber(calculateAngle(currentTemp));
 updateTime();
 temperatureInit();
 setTimeout(everyMinute, 5000);
