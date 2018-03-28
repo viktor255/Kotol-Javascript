@@ -32,11 +32,11 @@ function writeNumberSlow(angle) {
     var i = currentAngle;
     if(angle > currentAngle) {
         for (; i < angle; i--) {
-            setTimeout(writeNumber(i), delayPeriod);
+            setTimeout(writeNumber, delayPeriod, i);
         }
     } else {
         for (; i > angle; i++) {
-            setTimeout(writeNumber(i), delayPeriod);
+            setTimeout(writeNumber(i), delayPeriod, i);
         }
     }
 }
