@@ -17,7 +17,7 @@ wiringpi.pwmSetRange(2000);
 var min = 80;
 var max = 260;
 var currentAngle = min;
-var delayPeriod = 0.01;
+var delayPeriod = 10;
 
 function calculateAngle(temperature) {
     return min + temperature*20;

@@ -26,7 +26,7 @@ wiringpi.pwmSetRange(2000);
 var min = 80;
 var max = 260;
 var currentAngle = min;
-var delayPeriod = 0.01;
+var delayPeriod = 10;
 
 function calculateAngle(temperature) {
     return min + temperature*20;
@@ -64,7 +64,7 @@ var nextTemp = 0;
 function setTemperature(temp){
     console.log();
     console.log('Temperature set to: ' + temp);
-    writeNumber(calculateAngle(temp));
+    writeNumberSlow(calculateAngle(temp));
 }
 
 function printInfo(){
@@ -93,7 +93,7 @@ function temperatureInit(){
         if(timeConfigs.length > 0 ) {
             lastTime = timeConfigs[0].time;
             currentTemp = timeConfigs[0].temperature;
-            writeNumber(calculateAngle(currentTemp));
+            writeNumberSlow(calculateAngle(currentTemp));
         }
     });
     TimeConfig.find({time: {$gte: currentTime }}).sort({time:1}).exec(function (err, timeConfigs) {
@@ -129,7 +129,7 @@ function everyMinute(){
 
 }
 
-writeNumber(calculateAngle(currentTemp));
+writeNumberSlow(calculateAngle(currentTemp));
 updateTime();
 temperatureInit();
 setTimeout(everyMinute, 5000);
