@@ -127,7 +127,7 @@ function everyMinute(){
 
 }
 
-writeNumberSlow(calculateAngle(currentTemp));
+writeNumber(calculateAngle(currentTemp));
 updateTime();
 temperatureInit();
 setTimeout(everyMinute, 5000);
