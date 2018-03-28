@@ -41,11 +41,13 @@ function writeNumberSlow(angle) {
     var i = currentAngle;
     if(angle > currentAngle) {
         for (; i < angle; i--) {
-            setTimeout(writeNumber, delayPeriod, i);
+            // setTimeout(writeNumber, delayPeriod, i);
+            writeNumber(i);
         }
     } else {
         for (; i > angle; i++) {
-            setTimeout(writeNumber, delayPeriod, i);
+            // setTimeout(writeNumber, delayPeriod, i);
+            writeNumber(i);
         }
     }
 }
@@ -127,7 +129,7 @@ function everyMinute(){
 
 }
 
-writeNumber(calculateAngle(currentTemp));
+writeNumberSlow(calculateAngle(currentTemp));
 updateTime();
 temperatureInit();
 setTimeout(everyMinute, 5000);
