@@ -45,7 +45,7 @@ function writeNumberSlow(angle) {
         }
     } else {
         for (; i > angle; i++) {
-            setTimeout(writeNumber(i), delayPeriod, i);
+            setTimeout(writeNumber, delayPeriod, i);
         }
     }
 }
