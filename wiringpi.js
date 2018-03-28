@@ -31,12 +31,12 @@ function writeNumber(angle) {
 function writeNumberSlow(angle) {
     var i = currentAngle;
     if(angle > currentAngle) {
-        for (; i > angle; i--) {
+        for (; i < angle; i--) {
             writeNumber(i);
             setTimeout(delayPeriod);
         }
     } else {
-        for (; i < angle; i++) {
+        for (; i > angle; i++) {
             writeNumber(i);
             setTimeout(delayPeriod);
         }
