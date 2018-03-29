@@ -37,18 +37,28 @@ function writeNumber(angle) {
     currentAngle = angle;
 }
 
+function delayedWrite(currentAngle, desiredAngle, positive){
+    // break if desiredAngle has been reached
+    if (positive && (currentAngle >= desiredAngle)) return;
+    if (!positive && (currentAngle <= desiredAngle)) return;
+    setTimeout(function() {
+        if (positive)
+            currentAngle++;
+        else
+            currentAngle--;
+        // console.log(currentAngle);
+
+        writeNumber(currentAngle);
+        // call next() recursively
+        delayedWrite(currentAngle, desiredAngle, positive);
+    }, delayPeriod);
+}
+
 function writeNumberSlow(angle) {
-    var i = currentAngle;
     if(angle > currentAngle) {
-        for (; i < angle; i--) {
-            // setTimeout(writeNumber, delayPeriod, i);
-            writeNumber(i);
-        }
+        delayedWrite(currentAngle, angle, true);
     } else {
-        for (; i > angle; i++) {
-            // setTimeout(writeNumber, delayPeriod, i);
-            writeNumber(i);
-        }
+        delayedWrite(currentAngle, angle, false);
     }
 }
 
