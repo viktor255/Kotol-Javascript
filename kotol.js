@@ -46,7 +46,7 @@ function delayedWrite(currentAngle, desiredAngle, positive){
             currentAngle++;
         else
             currentAngle--;
-        // console.log(currentAngle);
+        console.log(currentAngle);
 
         writeNumber(currentAngle);
         // call next() recursively
