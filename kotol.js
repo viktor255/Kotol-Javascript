@@ -103,7 +103,7 @@ function temperatureInit(){
         if(timeConfigs.length > 0 ) {
             lastTime = timeConfigs[0].time;
             currentTemp = timeConfigs[0].temperature;
-            // writeNumberSlow(calculateAngle(currentTemp));
+            writeNumberSlow(calculateAngle(currentTemp));
         }
     });
     TimeConfig.find({time: {$gte: currentTime }}).sort({time:1}).exec(function (err, timeConfigs) {
@@ -140,6 +140,7 @@ function everyMinute(){
 
 writeNumberSlow(calculateAngle(currentTemp));
 updateTime();
-temperatureInit();
-setTimeout(everyMinute, 10000);
+// temperatureInit();
+setTimeout(temperatureInit, 5000);
+// setTimeout(everyMinute, 5000);
 setInterval(everyMinute, 60000);
