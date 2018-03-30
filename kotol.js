@@ -46,7 +46,7 @@ function delayedWrite(currentAngle, desiredAngle, positive){
             currentAngle++;
         else
             currentAngle--;
-        console.log(currentAngle);
+        // console.log(currentAngle);
 
         writeNumber(currentAngle);
         // call next() recursively
@@ -138,9 +138,9 @@ function everyMinute(){
     updateNextConfig();
 }
 
-writeNumberSlow(calculateAngle(currentTemp));
+writeNumber(calculateAngle(currentTemp));
 updateTime();
 // temperatureInit();
-setTimeout(temperatureInit, 5000);
-// setTimeout(everyMinute, 5000);
+setTimeout(temperatureInit, 2000);
+setTimeout(everyMinute, 7000);
 setInterval(everyMinute, 60000);
