@@ -92,8 +92,10 @@ function printInfo(){
 }
 
 function writeCurrentTemp(){
-    // CurrentTimeConfig.updateOne({},{time: currentTime, temperature: calculateTemperature(currentAngle)});
-    CurrentTimeConfig.insertOne({time: currentTime, temperature: calculateTemperature(currentAngle)});
+    CurrentTimeConfig.updateOne({},{$set: {time: currentTime, temperature: calculateTemperature(currentAngle)}}, function (err, timeConfig) {
+        if (err) throw err;
+        console.log('Wrote current temperature to db.')
+    });
 }
 
 function updateNextConfig(){
