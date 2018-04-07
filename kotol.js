@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://viktor:viktor-bojler@boilertimeconfigs-shard-00-00-ssig8.mongodb.net:27017,boilertimeconfigs-shard-00-01-ssig8.mongodb.net:27017,boilertimeconfigs-shard-00-02-ssig8.mongodb.net:27017/kotol?ssl=true&replicaSet=boilerTimeConfigs-shard-0&authSource=admin');
 
 var TimeConfig = require('./models/timeConfig');
+var CurrentTimeConfig = require('./models/currentTimeConfig');
 
 
 // wiringpi start
@@ -30,6 +31,10 @@ var delayPeriod = 10;
 
 function calculateAngle(temperature) {
     return min + temperature*20;
+}
+
+function calculateTemperature(angle) {
+    return (angle - min) / 20;
 }
 
 function writeNumber(angle) {
@@ -84,6 +89,11 @@ function printInfo(){
     console.log('last time: \t\t' + lastTime);
     console.log('current time: \t\t' + currentTime);
     console.log('next time: \t\t' + nextTime);
+}
+
+function writeCurrentTemp(){
+    // CurrentTimeConfig.updateOne({},{time: currentTime, temperature: calculateTemperature(currentAngle)});
+    CurrentTimeConfig.insertOne({time: currentTime, temperature: calculateTemperature(currentAngle)});
 }
 
 function updateNextConfig(){
@@ -142,5 +152,6 @@ writeNumber(calculateAngle(currentTemp));
 updateTime();
 // temperatureInit();
 setTimeout(temperatureInit, 2000);
+setTimeout(writeCurrentTemp, 5000);
 setTimeout(everyMinute, 7000);
 setInterval(everyMinute, 60000);
