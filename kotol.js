@@ -92,7 +92,7 @@ function printInfo(){
 }
 
 function writeCurrentTempToDB(){
-    CurrentTimeConfig.updateOne({},{$set: {time: currentTime, temperature: calculateTemperature(currentAngle)}}, function (err, timeConfig) {
+    CurrentTimeConfig.updateOne({},{$set: {time: new Date().getTime(), temperature: calculateTemperature(currentAngle)}}, function (err, timeConfig) {
         if (err) throw err;
         console.log('Wrote current temperature to db.')
     });
