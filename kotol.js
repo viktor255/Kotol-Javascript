@@ -91,7 +91,7 @@ function printInfo(){
     console.log('next time: \t\t' + nextTime);
 }
 
-function writeCurrentTemp(){
+function writeCurrentTempToDB(){
     CurrentTimeConfig.updateOne({},{$set: {time: currentTime, temperature: calculateTemperature(currentAngle)}}, function (err, timeConfig) {
         if (err) throw err;
         console.log('Wrote current temperature to db.')
@@ -147,6 +147,7 @@ function everyMinute(){
         currentTemp = nextTemp;
         setTemperature(currentTemp);
     }
+    writeCurrentTempToDB();
     updateNextConfig();
 }
 
@@ -154,6 +155,5 @@ writeNumber(calculateAngle(currentTemp));
 updateTime();
 // temperatureInit();
 setTimeout(temperatureInit, 2000);
-setTimeout(writeCurrentTemp, 5000);
 setTimeout(everyMinute, 7000);
 setInterval(everyMinute, 60000);
