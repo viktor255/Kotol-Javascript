@@ -6,4 +6,4 @@ var schema = new Schema({
     temperature: {type: Number, required: true}
 });
 
-module.exports = mongoose.model('TimeConfig', schema);
+module.exports = mongoose.model('CurrentTimeConfig', schema);
