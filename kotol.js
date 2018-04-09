@@ -128,6 +128,7 @@ function updateLastConfig() {
             if (lastTime !== timeConfigs[0].time) {
                 lastTime = timeConfigs[0].time;
                 currentTemp = timeConfigs[0].temperature;
+                console.log('Change found');
                 setTemperature(currentTemp);
             }
         }
