@@ -209,12 +209,12 @@ function everyMinute() {
         currentTemp = nextTemp;
         setTemperature(currentTemp);
     }
-    writeCurrentTempToDB();
     updateFirstConfig();
     updateLastConfig();
     updateNextConfig();
     updatePrevConfig();
     setTimeout(printInfo, 3000);
+    setTimeout(writeCurrentTempToDB, 4000);
 }
 
 function main() {
