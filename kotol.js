@@ -127,7 +127,7 @@ function updateFirstConfig() {
     });
 }
 
-function updateLastConfig(){
+function updateLastConfig() {
     TimeConfig.find().sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
         if (timeConfigs.length > 0) {
@@ -163,7 +163,7 @@ function updatePrevConfig() {
                 console.log('Change found');
                 setTemperature(currentTemp);
             }
-        } else {
+        } else if (previousTime !== lastTime) {
             previousTime = lastTime;
             currentTemp = lastTemp;
             setTemperature(currentTemp);
