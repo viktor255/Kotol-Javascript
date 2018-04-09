@@ -141,6 +141,9 @@ function temperatureInit() {
             lastTime = timeConfigs[0].time;
             currentTemp = timeConfigs[0].temperature;
             setTemperature(currentTemp);
+        } else {
+            nextTime = '00:00';
+            nextTemp = 0;
         }
     });
     TimeConfig.find({time: {$gte: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
@@ -148,6 +151,9 @@ function temperatureInit() {
         if (timeConfigs.length > 0) {
             nextTime = timeConfigs[0].time;
             nextTemp = timeConfigs[0].temperature;
+        } else {
+            nextTime = '00:00';
+            nextTemp = 0;
         }
     });
 }
