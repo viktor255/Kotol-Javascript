@@ -175,7 +175,7 @@ function everyMinute() {
     writeCurrentTempToDB();
     updateNextConfig();
     updateLastConfig();
-    setTimeout(printInfo(), 3000);
+    setTimeout(printInfo, 3000);
 }
 
 function main(){
