@@ -167,7 +167,7 @@ function updateTime() {
 
 function everyMinute() {
     updateTime();
-    if (currentTime >= nextTime) {
+    if (currentTime >= nextTime && nextTime !== '00:00') {
         lastTime = nextTime;
         currentTemp = nextTemp;
         setTemperature(currentTemp);
