@@ -117,7 +117,6 @@ function updateNextConfig() {
             nextTime = timeConfigs[0].time;
             nextTemp = timeConfigs[0].temperature;
         }
-        printInfo();
     });
 }
 
@@ -176,6 +175,7 @@ function everyMinute() {
     writeCurrentTempToDB();
     updateNextConfig();
     updateLastConfig();
+    setTimeout(printInfo(), 3000);
 }
 
 function main(){
