@@ -191,7 +191,7 @@ function everyMinute() {
     updateLastConfig();
 }
 
-writeNumber(calculateAngle(currentTemp));
+writeNumber(calculateAngle(currentTemp), wiringpiFunctionality());
 updateTime();
 // temperatureInit();
 setTimeout(temperatureInit, 2000);
