@@ -204,7 +204,7 @@ function updateTime() {
 
 function everyMinute() {
     updateTime();
-    if (currentTime >= nextTime && nextTime !== '00:00') {
+    if (currentTime >= nextTime && nextTime !== firstTime) {
         previousTime = nextTime;
         currentTemp = nextTemp;
         setTemperature(currentTemp);
