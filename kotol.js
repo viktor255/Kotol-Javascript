@@ -142,8 +142,9 @@ function temperatureInit() {
             currentTemp = timeConfigs[0].temperature;
             setTemperature(currentTemp);
         } else {
-            nextTime = '00:00';
-            nextTemp = 0;
+            lastTime = nextTime;
+            currentTemp = nextTemp;
+            setTemperature(currentTemp);
         }
     });
     TimeConfig.find({time: {$gte: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
