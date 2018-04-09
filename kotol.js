@@ -25,6 +25,8 @@ function wiringpiFunctionality() {
     wiringpi.pwmSetClock(192);
     wiringpi.pwmSetRange(2000);
 
+    return wiringpi;
+
 }
 
 var min = 80;
@@ -40,27 +42,27 @@ function calculateTemperature(angle) {
     return (angle - min) / 20;
 }
 
-function writeNumber(angle) {
-    var wiringpi = require('wiringpi-node');
-
-    // # use 'GPIO naming'
-    wiringpi.setup('gpio');
-
-    // # set #18 to be a PWM output
-    wiringpi.pinMode(18, wiringpi.PWM_OUTPUT);
-
-    // # set the PWM mode to milliseconds stype
-    wiringpi.pwmSetMode(wiringpi.PWM_MODE_MS);
-
-    // # divide down clock
-    wiringpi.pwmSetClock(192);
-    wiringpi.pwmSetRange(2000);
+function writeNumber(angle, wiringpi) {
+    // var wiringpi = require('wiringpi-node');
+    //
+    // // # use 'GPIO naming'
+    // wiringpi.setup('gpio');
+    //
+    // // # set #18 to be a PWM output
+    // wiringpi.pinMode(18, wiringpi.PWM_OUTPUT);
+    //
+    // // # set the PWM mode to milliseconds stype
+    // wiringpi.pwmSetMode(wiringpi.PWM_MODE_MS);
+    //
+    // // # divide down clock
+    // wiringpi.pwmSetClock(192);
+    // wiringpi.pwmSetRange(2000);
 
     wiringpi.pwmWrite(18, angle);
     currentAngle = angle;
 }
 
-function delayedWrite(currentAngle, desiredAngle, positive) {
+function delayedWrite(currentAngle, desiredAngle, positive, wiringpi) {
     // break if desiredAngle has been reached
     if (positive && (currentAngle >= desiredAngle)) return;
     if (!positive && (currentAngle <= desiredAngle)) return;
@@ -71,17 +73,18 @@ function delayedWrite(currentAngle, desiredAngle, positive) {
             currentAngle--;
         // console.log(currentAngle);
 
-        writeNumber(currentAngle);
+        writeNumber(currentAngle, wiringpi);
         // call next() recursively
         delayedWrite(currentAngle, desiredAngle, positive);
     }, delayPeriod);
 }
 
 function writeNumberSlow(angle) {
+    var wiringpi = wiringpiFunctionality();
     if (angle > currentAngle) {
-        delayedWrite(currentAngle, angle, true);
+        delayedWrite(currentAngle, angle, true, wiringpi);
     } else {
-        delayedWrite(currentAngle, angle, false);
+        delayedWrite(currentAngle, angle, false, wiringpi);
     }
 }
 
