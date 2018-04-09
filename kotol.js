@@ -8,10 +8,9 @@ var CurrentTimeConfig = require('./models/currentTimeConfig');
 
 
 // wiringpi start
-function wiringpiFunctionality() {
-    var wiringpi = require('wiringpi-node');
-    // var wiringpi = require('wiring-pi');
+var wiringpi = require('wiringpi-node');
 
+function wiringpiFunctionality() {
     // # use 'GPIO naming'
     wiringpi.setup('gpio');
 
@@ -24,9 +23,10 @@ function wiringpiFunctionality() {
     // # divide down clock
     wiringpi.pwmSetClock(192);
     wiringpi.pwmSetRange(2000);
+}
 
-    return wiringpi;
-
+function wiringpiClear(){
+    wiringpi.pinMode(18, wiringpi.INPUT);
 }
 
 var min = 80;
@@ -42,27 +42,12 @@ function calculateTemperature(angle) {
     return (angle - min) / 20;
 }
 
-function writeNumber(angle, wiringpi) {
-    // var wiringpi = require('wiringpi-node');
-    //
-    // // # use 'GPIO naming'
-    // wiringpi.setup('gpio');
-    //
-    // // # set #18 to be a PWM output
-    // wiringpi.pinMode(18, wiringpi.PWM_OUTPUT);
-    //
-    // // # set the PWM mode to milliseconds stype
-    // wiringpi.pwmSetMode(wiringpi.PWM_MODE_MS);
-    //
-    // // # divide down clock
-    // wiringpi.pwmSetClock(192);
-    // wiringpi.pwmSetRange(2000);
-
+function writeNumber(angle) {
     wiringpi.pwmWrite(18, angle);
     currentAngle = angle;
 }
 
-function delayedWrite(currentAngle, desiredAngle, positive, wiringpi) {
+function delayedWrite(currentAngle, desiredAngle, positive) {
     // break if desiredAngle has been reached
     if (positive && (currentAngle >= desiredAngle)) return;
     if (!positive && (currentAngle <= desiredAngle)) return;
@@ -73,19 +58,20 @@ function delayedWrite(currentAngle, desiredAngle, positive, wiringpi) {
             currentAngle--;
         // console.log(currentAngle);
 
-        writeNumber(currentAngle, wiringpi);
+        writeNumber(currentAngle);
         // call next() recursively
-        delayedWrite(currentAngle, desiredAngle, positive, wiringpi);
+        delayedWrite(currentAngle, desiredAngle, positive);
     }, delayPeriod);
 }
 
 function writeNumberSlow(angle) {
-    var wiringpi = wiringpiFunctionality();
+    wiringpiFunctionality();
     if (angle > currentAngle) {
         delayedWrite(currentAngle, angle, true, wiringpi);
     } else {
         delayedWrite(currentAngle, angle, false, wiringpi);
     }
+    setTimeout(wiringpiClear, 5000);
 }
 
 // wiringpi end
@@ -191,9 +177,14 @@ function everyMinute() {
     updateLastConfig();
 }
 
-writeNumber(calculateAngle(currentTemp), wiringpiFunctionality());
-updateTime();
-// temperatureInit();
-setTimeout(temperatureInit, 2000);
-setTimeout(everyMinute, 7000);
-setInterval(everyMinute, 60000);
+function main(){
+    wiringpiFunctionality();
+    writeNumber(calculateAngle(currentTemp));
+    updateTime();
+    setTimeout(temperatureInit, 2000);
+    setTimeout(everyMinute, 7000);
+    setInterval(everyMinute, 60000);
+}
+
+main();
+
