@@ -75,7 +75,7 @@ function delayedWrite(currentAngle, desiredAngle, positive, wiringpi) {
 
         writeNumber(currentAngle, wiringpi);
         // call next() recursively
-        delayedWrite(currentAngle, desiredAngle, positive);
+        delayedWrite(currentAngle, desiredAngle, positive, wiringpi);
     }, delayPeriod);
 }
 
