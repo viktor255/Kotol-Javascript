@@ -109,13 +109,26 @@ function updateNextConfig(){
     });
 }
 
+function updateLastConfig(){
+    TimeConfig.find({time: {$lt: currentTime }}).sort({time:-1}).exec(function (err, timeConfigs) {
+        if (err) throw err;
+        if(timeConfigs.length > 0 ) {
+            if(lastTime !== timeConfigs[0].time){
+                lastTime = timeConfigs[0].time;
+                currentTemp = timeConfigs[0].temperature;
+                setTemperature(currentTemp);
+            }
+        }
+    });
+}
+
 function temperatureInit(){
     TimeConfig.find({time: {$lt: currentTime }}).sort({time:-1}).exec(function (err, timeConfigs) {
         if (err) throw err;
         if(timeConfigs.length > 0 ) {
             lastTime = timeConfigs[0].time;
             currentTemp = timeConfigs[0].temperature;
-            writeNumberSlow(calculateAngle(currentTemp));
+            setTemperature(currentTemp);
         }
     });
     TimeConfig.find({time: {$gte: currentTime }}).sort({time:1}).exec(function (err, timeConfigs) {
@@ -149,6 +162,7 @@ function everyMinute(){
     }
     writeCurrentTempToDB();
     updateNextConfig();
+    updateLastConfig();
 }
 
 writeNumber(calculateAngle(currentTemp));
