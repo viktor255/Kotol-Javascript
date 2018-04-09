@@ -8,21 +8,24 @@ var CurrentTimeConfig = require('./models/currentTimeConfig');
 
 
 // wiringpi start
-var wiringpi = require('wiringpi-node');
-// var wiringpi = require('wiring-pi');
+function wiringpiFunctionality() {
+    var wiringpi = require('wiringpi-node');
+    // var wiringpi = require('wiring-pi');
 
-// # use 'GPIO naming'
-wiringpi.setup('gpio');
+    // # use 'GPIO naming'
+    wiringpi.setup('gpio');
 
-// # set #18 to be a PWM output
-wiringpi.pinMode(18, wiringpi.PWM_OUTPUT);
+    // # set #18 to be a PWM output
+    wiringpi.pinMode(18, wiringpi.PWM_OUTPUT);
 
-// # set the PWM mode to milliseconds stype
-wiringpi.pwmSetMode(wiringpi.PWM_MODE_MS);
+    // # set the PWM mode to milliseconds stype
+    wiringpi.pwmSetMode(wiringpi.PWM_MODE_MS);
 
-// # divide down clock
-wiringpi.pwmSetClock(192);
-wiringpi.pwmSetRange(2000);
+    // # divide down clock
+    wiringpi.pwmSetClock(192);
+    wiringpi.pwmSetRange(2000);
+
+}
 
 var min = 80;
 var max = 260;
@@ -30,7 +33,7 @@ var currentAngle = min;
 var delayPeriod = 10;
 
 function calculateAngle(temperature) {
-    return min + temperature*20;
+    return min + temperature * 20;
 }
 
 function calculateTemperature(angle) {
@@ -38,15 +41,30 @@ function calculateTemperature(angle) {
 }
 
 function writeNumber(angle) {
+    var wiringpi = require('wiringpi-node');
+
+    // # use 'GPIO naming'
+    wiringpi.setup('gpio');
+
+    // # set #18 to be a PWM output
+    wiringpi.pinMode(18, wiringpi.PWM_OUTPUT);
+
+    // # set the PWM mode to milliseconds stype
+    wiringpi.pwmSetMode(wiringpi.PWM_MODE_MS);
+
+    // # divide down clock
+    wiringpi.pwmSetClock(192);
+    wiringpi.pwmSetRange(2000);
+
     wiringpi.pwmWrite(18, angle);
     currentAngle = angle;
 }
 
-function delayedWrite(currentAngle, desiredAngle, positive){
+function delayedWrite(currentAngle, desiredAngle, positive) {
     // break if desiredAngle has been reached
     if (positive && (currentAngle >= desiredAngle)) return;
     if (!positive && (currentAngle <= desiredAngle)) return;
-    setTimeout(function() {
+    setTimeout(function () {
         if (positive)
             currentAngle++;
         else
@@ -60,7 +78,7 @@ function delayedWrite(currentAngle, desiredAngle, positive){
 }
 
 function writeNumberSlow(angle) {
-    if(angle > currentAngle) {
+    if (angle > currentAngle) {
         delayedWrite(currentAngle, angle, true);
     } else {
         delayedWrite(currentAngle, angle, false);
@@ -76,13 +94,13 @@ var nextTime = '00:00';
 var currentTemp = 0;
 var nextTemp = 0;
 
-function setTemperature(temp){
+function setTemperature(temp) {
     console.log();
     console.log('Temperature set to: ' + temp);
     writeNumberSlow(calculateAngle(temp));
 }
 
-function printInfo(){
+function printInfo() {
     console.log();
     console.log('current temperature: \t' + currentTemp);
     console.log('next temperature: \t' + nextTemp);
@@ -91,17 +109,22 @@ function printInfo(){
     console.log('next time: \t\t' + nextTime);
 }
 
-function writeCurrentTempToDB(){
-    CurrentTimeConfig.updateOne({},{$set: {time: new Date().getTime(), temperature: calculateTemperature(currentAngle)}}, function (err, timeConfig) {
+function writeCurrentTempToDB() {
+    CurrentTimeConfig.updateOne({}, {
+        $set: {
+            time: new Date().getTime(),
+            temperature: calculateTemperature(currentAngle)
+        }
+    }, function (err, timeConfig) {
         if (err) throw err;
         console.log('Wrote current temperature to db.')
     });
 }
 
-function updateNextConfig(){
-    TimeConfig.find({time: {$gt: currentTime }}).sort({time:1}).exec(function (err, timeConfigs) {
+function updateNextConfig() {
+    TimeConfig.find({time: {$gt: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
         if (err) throw err;
-        if(timeConfigs.length > 0 ) {
+        if (timeConfigs.length > 0) {
             nextTime = timeConfigs[0].time;
             nextTemp = timeConfigs[0].temperature;
         }
@@ -109,11 +132,11 @@ function updateNextConfig(){
     });
 }
 
-function updateLastConfig(){
-    TimeConfig.find({time: {$lt: currentTime }}).sort({time:-1}).exec(function (err, timeConfigs) {
+function updateLastConfig() {
+    TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
-        if(timeConfigs.length > 0 ) {
-            if(lastTime !== timeConfigs[0].time){
+        if (timeConfigs.length > 0) {
+            if (lastTime !== timeConfigs[0].time) {
                 lastTime = timeConfigs[0].time;
                 currentTemp = timeConfigs[0].temperature;
                 setTemperature(currentTemp);
@@ -122,40 +145,40 @@ function updateLastConfig(){
     });
 }
 
-function temperatureInit(){
-    TimeConfig.find({time: {$lt: currentTime }}).sort({time:-1}).exec(function (err, timeConfigs) {
+function temperatureInit() {
+    TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
-        if(timeConfigs.length > 0 ) {
+        if (timeConfigs.length > 0) {
             lastTime = timeConfigs[0].time;
             currentTemp = timeConfigs[0].temperature;
             setTemperature(currentTemp);
         }
     });
-    TimeConfig.find({time: {$gte: currentTime }}).sort({time:1}).exec(function (err, timeConfigs) {
+    TimeConfig.find({time: {$gte: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
         if (err) throw err;
-        if(timeConfigs.length > 0 ) {
+        if (timeConfigs.length > 0) {
             nextTime = timeConfigs[0].time;
             nextTemp = timeConfigs[0].temperature;
         }
     });
 }
 
-function updateTime(){
+function updateTime() {
     var date = new Date();
     var hours = date.getHours();
-    if(hours <= 9) {
+    if (hours <= 9) {
         hours = '0' + hours;
     }
     var minutes = date.getMinutes();
-    if(minutes <= 9) {
+    if (minutes <= 9) {
         minutes = '0' + minutes;
     }
     currentTime = hours + ':' + minutes;
 }
 
-function everyMinute(){
+function everyMinute() {
     updateTime();
-    if(currentTime >= nextTime) {
+    if (currentTime >= nextTime) {
         lastTime = nextTime;
         currentTemp = nextTemp;
         setTemperature(currentTemp);
