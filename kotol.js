@@ -157,7 +157,7 @@ function updatePrevConfig() {
     TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
         if (timeConfigs.length > 0) {
-            if (previousTime !== timeConfigs[0].time) {
+            if (previousTime !== timeConfigs[0].time || currentTemp !== timeConfigs[0].temperature) {
                 previousTime = timeConfigs[0].time;
                 currentTemp = timeConfigs[0].temperature;
                 console.log('Change found');
