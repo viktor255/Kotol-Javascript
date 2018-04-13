@@ -45,6 +45,7 @@ function calculateTemperature(angle) {
 function writeNumber(angle) {
     wiringpi.pwmWrite(18, angle);
     currentAngle = angle;
+    console.log(angle);
 }
 
 function delayedWrite(currentAngle, desiredAngle, positive) {
@@ -219,7 +220,7 @@ function everyMinute() {
 
 function main() {
     wiringpiFunctionality();
-    writeNumber(calculateAngle(currentTemp));
+    writeNumber(calculateAngle(0));
     updateTime();
     setTimeout(temperatureInit, 2000);
     setTimeout(everyMinute, 7000);
