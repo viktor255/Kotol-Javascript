@@ -80,12 +80,12 @@ function writeNumberSlow(angle) {
 
 var currentTime;
 var previousTime = '00:00';
-var nextTime = '00:00';
+// var nextTime = '00:00';
 var currentTemp = 0;
-var nextTemp = 0;
-var firstTime;
+// var nextTemp = 0;
+// var firstTime;
 var lastTime;
-var firstTemp;
+// var firstTemp;
 var lastTemp;
 
 function setTemperature(temp) {
@@ -117,18 +117,18 @@ function writeCurrentTempToDB() {
     });
 }
 
-function updateFirstConfig() {
-    TimeConfig.find().sort({time: 1}).exec(function (err, timeConfigs) {
-        if (err) throw err;
-        if (timeConfigs.length > 0) {
-            firstTime = timeConfigs[0].time;
-            firstTemp = timeConfigs[0].temperature;
-        } else {
-            firstTime = '00:00';
-            firstTemp = 0;
-        }
-    });
-}
+// function updateFirstConfig() {
+//     TimeConfig.find().sort({time: 1}).exec(function (err, timeConfigs) {
+//         if (err) throw err;
+//         if (timeConfigs.length > 0) {
+//             firstTime = timeConfigs[0].time;
+//             firstTemp = timeConfigs[0].temperature;
+//         } else {
+//             firstTime = '00:00';
+//             firstTemp = 0;
+//         }
+//     });
+// }
 
 function updateLastConfig() {
     TimeConfig.find().sort({time: -1}).exec(function (err, timeConfigs) {
@@ -144,18 +144,18 @@ function updateLastConfig() {
     });
 }
 
-function updateNextConfig() {
-    TimeConfig.find({time: {$gt: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
-        if (err) throw err;
-        if (timeConfigs.length > 0) {
-            nextTime = timeConfigs[0].time;
-            nextTemp = timeConfigs[0].temperature;
-        } else {
-            nextTime = firstTime;
-            nextTemp = firstTemp;
-        }
-    });
-}
+// function updateNextConfig() {
+//     TimeConfig.find({time: {$gt: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
+//         if (err) throw err;
+//         if (timeConfigs.length > 0) {
+//             nextTime = timeConfigs[0].time;
+//             nextTemp = timeConfigs[0].temperature;
+//         } else {
+//             nextTime = firstTime;
+//             nextTemp = firstTemp;
+//         }
+//     });
+// }
 
 function updatePrevConfig() {
     TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
@@ -186,13 +186,13 @@ function temperatureInit() {
             setTemperature(currentTemp);
         }
     });
-    TimeConfig.find({time: {$gte: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
-        if (err) throw err;
-        if (timeConfigs.length > 0) {
-            nextTime = timeConfigs[0].time;
-            nextTemp = timeConfigs[0].temperature;
-        }
-    });
+    // TimeConfig.find({time: {$gte: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
+    //     if (err) throw err;
+    //     if (timeConfigs.length > 0) {
+    //         nextTime = timeConfigs[0].time;
+    //         nextTemp = timeConfigs[0].temperature;
+    //     }
+    // });
     updateLastConfig();
 }
 
