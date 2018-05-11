@@ -97,10 +97,12 @@ function setTemperature(temp) {
 function printInfo() {
     console.log();
     console.log('current temperature: \t' + currentTemp);
-    console.log('next temperature: \t' + nextTemp);
+    // console.log('next temperature: \t' + nextTemp);
+    console.log('last temperature: \t' + lastTemp);
     console.log('previous time: \t\t' + previousTime);
     console.log('current time: \t\t' + currentTime);
-    console.log('next time: \t\t' + nextTime);
+    // console.log('next time: \t\t' + nextTime);
+    console.log('last time: \t\t' + lastTime);
 }
 
 function writeCurrentTempToDB() {
