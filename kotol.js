@@ -167,7 +167,7 @@ function updatePrevConfig() {
                 console.log('Change found');
                 setTemperature(currentTemp);
             }
-        } else if (previousTime !== lastTime) {
+        } else if (previousTime !== lastTime || currentTemp !== lastTemp) {
             previousTime = lastTime;
             currentTemp = lastTemp;
             setTemperature(currentTemp);
