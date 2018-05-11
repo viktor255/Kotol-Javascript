@@ -32,7 +32,7 @@ function wiringpiClear() {
 var min = 80;
 var max = 260;
 var currentAngle = min;
-var delayPeriod = 10;
+var delayPeriod = 20;
 
 function calculateAngle(temperature) {
     return min + temperature * 20;
@@ -72,7 +72,7 @@ function writeNumberSlow(angle) {
     } else {
         delayedWrite(currentAngle, angle, false, wiringpi);
     }
-    setTimeout(wiringpiClear, 5000);
+    setTimeout(wiringpiClear, delayPeriod*200 + 1000);
 }
 
 // wiringpi end
