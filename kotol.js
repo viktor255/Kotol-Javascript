@@ -131,6 +131,7 @@ function updateFirstConfig() {
 function updateLastConfig() {
     TimeConfig.find().sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
+        console.log('Updating last config');
         if (timeConfigs.length > 0) {
             lastTime = timeConfigs[0].time;
             lastTemp = timeConfigs[0].temperature;
