@@ -168,6 +168,8 @@ function updatePrevConfig() {
             previousTime = lastTime;
             currentTemp = lastTemp;
             setTemperature(currentTemp);
+        } else {
+            updateLastConfig();
         }
     });
 }
@@ -188,6 +190,7 @@ function temperatureInit() {
             nextTemp = timeConfigs[0].temperature;
         }
     });
+    updateLastConfig();
 }
 
 function updateTime() {
@@ -205,14 +208,14 @@ function updateTime() {
 
 function everyMinute() {
     updateTime();
-    if (currentTime >= nextTime && nextTime !== firstTime) {
-        previousTime = nextTime;
-        currentTemp = nextTemp;
-        setTemperature(currentTemp);
-    }
-    updateFirstConfig();
-    updateLastConfig();
-    updateNextConfig();
+    // if (currentTime >= nextTime && nextTime !== firstTime) {
+    //     previousTime = nextTime;
+    //     currentTemp = nextTemp;
+    //     setTemperature(currentTemp);
+    // }
+    // updateFirstConfig();
+    // updateLastConfig();
+    // updateNextConfig();
     updatePrevConfig();
     setTimeout(printInfo, 3000);
     setTimeout(writeCurrentTempToDB, 4000);
