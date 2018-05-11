@@ -93,10 +93,10 @@ function setTemperature(temp) {
 function printInfo() {
     console.log();
     console.log('current temperature: \t' + currentTemp);
-    console.log('last temperature(updated only when needed): \t' + lastTemp);
+    console.log('last temperature: \t' + lastTemp + ' (updated only when needed)');
     console.log('previous time: \t\t' + previousTime);
     console.log('current time: \t\t' + currentTime);
-    console.log('last time(updated only when needed): \t\t' + lastTime);
+    console.log('last time: \t\t' + lastTime + ' (updated only when needed)');
 }
 
 function writeCurrentTempToDB() {
@@ -146,18 +146,6 @@ function updatePrevConfig() {
     });
 }
 
-// function temperatureInit() {
-//     TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
-//         if (err) throw err;
-//         if (timeConfigs.length > 0) {
-//             previousTime = timeConfigs[0].time;
-//             currentTemp = timeConfigs[0].temperature;
-//             setTemperature(currentTemp);
-//         }
-//     });
-//     updateLastConfig();
-// }
-
 function updateTime() {
     var date = new Date();
     var hours = date.getHours();
@@ -181,8 +169,6 @@ function everyMinute() {
 function main() {
     wiringpiFunctionality();
     writeNumber(calculateAngle(0));
-    // updateTime();
-    // setTimeout(temperatureInit, 2000);
     setTimeout(updateLastConfig, 2000);
     setTimeout(everyMinute, 7000);
     setInterval(everyMinute, 60000);
