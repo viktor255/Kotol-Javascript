@@ -80,12 +80,8 @@ function writeNumberSlow(angle) {
 
 var currentTime;
 var previousTime = '00:00';
-// var nextTime = '00:00';
 var currentTemp = 0;
-// var nextTemp = 0;
-// var firstTime;
 var lastTime;
-// var firstTemp;
 var lastTemp;
 
 function setTemperature(temp) {
@@ -97,12 +93,10 @@ function setTemperature(temp) {
 function printInfo() {
     console.log();
     console.log('current temperature: \t' + currentTemp);
-    // console.log('next temperature: \t' + nextTemp);
-    console.log('last temperature: \t' + lastTemp);
+    console.log('last temperature(updated only when needed): \t' + lastTemp);
     console.log('previous time: \t\t' + previousTime);
     console.log('current time: \t\t' + currentTime);
-    // console.log('next time: \t\t' + nextTime);
-    console.log('last time: \t\t' + lastTime);
+    console.log('last time(updated only when needed): \t\t' + lastTime);
 }
 
 function writeCurrentTempToDB() {
@@ -116,19 +110,6 @@ function writeCurrentTempToDB() {
         console.log('Wrote current temperature to db.')
     });
 }
-
-// function updateFirstConfig() {
-//     TimeConfig.find().sort({time: 1}).exec(function (err, timeConfigs) {
-//         if (err) throw err;
-//         if (timeConfigs.length > 0) {
-//             firstTime = timeConfigs[0].time;
-//             firstTemp = timeConfigs[0].temperature;
-//         } else {
-//             firstTime = '00:00';
-//             firstTemp = 0;
-//         }
-//     });
-// }
 
 function updateLastConfig() {
     TimeConfig.find().sort({time: -1}).exec(function (err, timeConfigs) {
@@ -144,19 +125,6 @@ function updateLastConfig() {
     });
 }
 
-// function updateNextConfig() {
-//     TimeConfig.find({time: {$gt: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
-//         if (err) throw err;
-//         if (timeConfigs.length > 0) {
-//             nextTime = timeConfigs[0].time;
-//             nextTemp = timeConfigs[0].temperature;
-//         } else {
-//             nextTime = firstTime;
-//             nextTemp = firstTemp;
-//         }
-//     });
-// }
-
 function updatePrevConfig() {
     TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
@@ -167,34 +135,28 @@ function updatePrevConfig() {
                 console.log('Change found');
                 setTemperature(currentTemp);
             }
-        } else if (previousTime !== lastTime || currentTemp !== lastTemp) {
-            previousTime = lastTime;
-            currentTemp = lastTemp;
-            setTemperature(currentTemp);
         } else {
+            if (previousTime !== lastTime || currentTemp !== lastTemp) {
+                previousTime = lastTime;
+                currentTemp = lastTemp;
+                setTemperature(currentTemp);
+            }
             updateLastConfig();
         }
     });
 }
 
-function temperatureInit() {
-    TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
-        if (err) throw err;
-        if (timeConfigs.length > 0) {
-            previousTime = timeConfigs[0].time;
-            currentTemp = timeConfigs[0].temperature;
-            setTemperature(currentTemp);
-        }
-    });
-    // TimeConfig.find({time: {$gte: currentTime}}).sort({time: 1}).exec(function (err, timeConfigs) {
-    //     if (err) throw err;
-    //     if (timeConfigs.length > 0) {
-    //         nextTime = timeConfigs[0].time;
-    //         nextTemp = timeConfigs[0].temperature;
-    //     }
-    // });
-    updateLastConfig();
-}
+// function temperatureInit() {
+//     TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
+//         if (err) throw err;
+//         if (timeConfigs.length > 0) {
+//             previousTime = timeConfigs[0].time;
+//             currentTemp = timeConfigs[0].temperature;
+//             setTemperature(currentTemp);
+//         }
+//     });
+//     updateLastConfig();
+// }
 
 function updateTime() {
     var date = new Date();
@@ -211,14 +173,6 @@ function updateTime() {
 
 function everyMinute() {
     updateTime();
-    // if (currentTime >= nextTime && nextTime !== firstTime) {
-    //     previousTime = nextTime;
-    //     currentTemp = nextTemp;
-    //     setTemperature(currentTemp);
-    // }
-    // updateFirstConfig();
-    // updateLastConfig();
-    // updateNextConfig();
     updatePrevConfig();
     setTimeout(printInfo, 3000);
     setTimeout(writeCurrentTempToDB, 4000);
@@ -227,8 +181,9 @@ function everyMinute() {
 function main() {
     wiringpiFunctionality();
     writeNumber(calculateAngle(0));
-    updateTime();
-    setTimeout(temperatureInit, 2000);
+    // updateTime();
+    // setTimeout(temperatureInit, 2000);
+    setTimeout(updateLastConfig, 2000);
     setTimeout(everyMinute, 7000);
     setInterval(everyMinute, 60000);
 }
