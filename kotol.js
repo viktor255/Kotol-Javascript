@@ -125,7 +125,7 @@ function updateLastConfig() {
     });
 }
 
-function updatePrevConfig() {
+function updatePreviousConfig() {
     TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
         if (timeConfigs.length > 0) {
@@ -161,7 +161,10 @@ function updateTime() {
 
 function everyMinute() {
     updateTime();
-    updatePrevConfig();
+    // update of last configuration at end of the day
+    if(currentTime === '23:59')
+        updateLastConfig();
+    updatePreviousConfig();
     setTimeout(printInfo, 3000);
     setTimeout(writeCurrentTempToDB, 4000);
 }
