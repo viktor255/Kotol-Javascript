@@ -1,7 +1,10 @@
 var mongoose = require('mongoose');
 
-// mongoose.connect('mongodb://localhost:27017/kotol');
-mongoose.connect('mongodb://heroku:heroku-bojler@boilertimeconfigs-shard-00-00-ssig8.mongodb.net:27017,boilertimeconfigs-shard-00-01-ssig8.mongodb.net:27017,boilertimeconfigs-shard-00-02-ssig8.mongodb.net:27017/kotol?ssl=true&replicaSet=boilerTimeConfigs-shard-0&authSource=admin');
+// MongoDB database connection either localhost or remote, provide link to your own database
+// var urlLink = 'mongodb://localhost:27017/kotol';
+var urlLink = 'mongodb://heroku:heroku-bojler@boilertimeconfigs-shard-00-00-ssig8.mongodb.net:27017,boilertimeconfigs-shard-00-01-ssig8.mongodb.net:27017,boilertimeconfigs-shard-00-02-ssig8.mongodb.net:27017/kotol?ssl=true&replicaSet=boilerTimeConfigs-shard-0&authSource=admin';
+
+mongoose.connect(urlLink);
 
 var TimeConfig = require('./models/timeConfig');
 var CurrentTimeConfig = require('./models/currentTimeConfig');
@@ -10,7 +13,7 @@ var CurrentTimeConfig = require('./models/currentTimeConfig');
 // wiringpi start
 var wiringpi = require('wiringpi-node');
 
-function wiringpiFunctionality() {
+function setUpPWMOut() {
     // # use 'GPIO naming'
     wiringpi.setup('gpio');
 
@@ -25,7 +28,8 @@ function wiringpiFunctionality() {
     wiringpi.pwmSetRange(2000);
 }
 
-function wiringpiClear() {
+// change pin mode to input - turn off servo
+function turnOffPWM() {
     wiringpi.pinMode(18, wiringpi.INPUT);
 }
 
@@ -66,13 +70,13 @@ function delayedWrite(currentAngle, desiredAngle, positive) {
 }
 
 function writeNumberSlow(angle) {
-    wiringpiFunctionality();
+    setUpPWMOut();
     if (angle > currentAngle) {
         delayedWrite(currentAngle, angle, true, wiringpi);
     } else {
         delayedWrite(currentAngle, angle, false, wiringpi);
     }
-    setTimeout(wiringpiClear, delayPeriod*200 + 1000);
+    setTimeout(turnOffPWM, delayPeriod*200 + 1000);
 }
 
 // wiringpi end
@@ -81,8 +85,8 @@ function writeNumberSlow(angle) {
 var currentTime;
 var previousTime = '00:00';
 var currentTemp = 0;
-var lastTime;
-var lastTemp;
+var lastTimeOfDay;
+var lastTempOfDay;
 
 function setTemperature(temp) {
     console.log();
@@ -93,10 +97,10 @@ function setTemperature(temp) {
 function printInfo() {
     console.log();
     console.log('current temperature: \t' + currentTemp);
-    console.log('last temperature: \t' + lastTemp + ' (updated only when needed)');
+    console.log('last temperature of day: \t' + lastTempOfDay + ' (updated only when needed)');
     console.log('previous time: \t\t' + previousTime);
     console.log('current time: \t\t' + currentTime);
-    console.log('last time: \t\t' + lastTime + ' (updated only when needed)');
+    console.log('last time of day: \t\t' + lastTimeOfDay + ' (updated only when needed)');
 }
 
 function writeCurrentTempToDB() {
@@ -111,16 +115,16 @@ function writeCurrentTempToDB() {
     });
 }
 
-function updateLastConfig() {
+function updateLastConfigOfDay() {
     TimeConfig.find().sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
         console.log('Updating last config');
         if (timeConfigs.length > 0) {
-            lastTime = timeConfigs[0].time;
-            lastTemp = timeConfigs[0].temperature;
+            lastTimeOfDay = timeConfigs[0].time;
+            lastTempOfDay = timeConfigs[0].temperature;
         } else {
-            lastTime = '00:00';
-            lastTemp = 0;
+            lastTimeOfDay = '00:00';
+            lastTempOfDay = 0;
         }
     });
 }
@@ -128,6 +132,7 @@ function updateLastConfig() {
 function updatePreviousConfig() {
     TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
+        // if config exists use it
         if (timeConfigs.length > 0) {
             if (previousTime !== timeConfigs[0].time || currentTemp !== timeConfigs[0].temperature) {
                 previousTime = timeConfigs[0].time;
@@ -135,13 +140,14 @@ function updatePreviousConfig() {
                 console.log('Change found');
                 setTemperature(currentTemp);
             }
+        //    if not - use lastConfigOfDay
         } else {
-            if (previousTime !== lastTime || currentTemp !== lastTemp) {
-                previousTime = lastTime;
-                currentTemp = lastTemp;
+            if (previousTime !== lastTimeOfDay || currentTemp !== lastTempOfDay) {
+                previousTime = lastTimeOfDay;
+                currentTemp = lastTempOfDay;
                 setTemperature(currentTemp);
             }
-            updateLastConfig();
+            updateLastConfigOfDay();
         }
     });
 }
@@ -163,16 +169,16 @@ function everyMinute() {
     updateTime();
     // update of last configuration at end of the day
     if(currentTime === '23:59')
-        updateLastConfig();
+        updateLastConfigOfDay();
     updatePreviousConfig();
     setTimeout(printInfo, 3000);
     setTimeout(writeCurrentTempToDB, 4000);
 }
 
 function main() {
-    wiringpiFunctionality();
+    setUpPWMOut();
     writeNumber(calculateAngle(0));
-    setTimeout(updateLastConfig, 2000);
+    setTimeout(updateLastConfigOfDay, 2000);
     setTimeout(everyMinute, 7000);
     setInterval(everyMinute, 60000);
 }
