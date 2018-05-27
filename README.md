@@ -1,6 +1,7 @@
 ## Synopsis
 
-Boiller controller - script to manage temperature of heating boiller. Designed to Raspberry Pi.
+Boiller controller - script to manage temperature of heating boiller. Designed to Raspberry Pi. 
+Code hosted on [GitHub repository](https://github.com/viktor255/Kotol-Javascript).
 
 ## Installation
 
