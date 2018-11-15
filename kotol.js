@@ -170,9 +170,17 @@ function everyMinute() {
     // update of last configuration at end of the day
     if(currentTime === '23:59')
         updateLastConfigOfDay();
+    // setting proper temperature to servo motor
+    if(/^[0-9][0-9]:[0-9]5$/.test(currentTime))
+        everyTenMinutesCheck();
     updatePreviousConfig();
     setTimeout(printInfo, 3000);
     setTimeout(writeCurrentTempToDB, 4000);
+}
+
+function everyTenMinutesCheck(){
+    console.log('Executing every-ten-minutes check.');
+    setTemperature(currentTemp);
 }
 
 function main() {
