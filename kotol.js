@@ -8,6 +8,8 @@ mongoose.connect(urlLink);
 
 var TimeConfig = require('./models/timeConfig');
 var CurrentTimeConfig = require('./models/currentTimeConfig');
+var Boost = require('./models/boost');
+var BoostConfig = require('./models/boostConfig');
 
 
 // wiringpi start
@@ -76,7 +78,7 @@ function writeNumberSlow(angle) {
     } else {
         delayedWrite(currentAngle, angle, false, wiringpi);
     }
-    setTimeout(turnOffPWM, delayPeriod*200 + 1000);
+    setTimeout(turnOffPWM, delayPeriod * 200 + 1000);
 }
 
 // wiringpi end
@@ -85,6 +87,7 @@ function writeNumberSlow(angle) {
 var currentTime;
 var previousTime = '00:00';
 var currentTemp = 0;
+var currentBoost = null;
 var lastTimeOfDay;
 var lastTempOfDay;
 
@@ -130,6 +133,9 @@ function updateLastConfigOfDay() {
 }
 
 function updatePreviousConfig() {
+    if (currentBoost) {
+        return;
+    }
     TimeConfig.find({time: {$lt: currentTime}}).sort({time: -1}).exec(function (err, timeConfigs) {
         if (err) throw err;
         // if config exists use it
@@ -140,7 +146,7 @@ function updatePreviousConfig() {
                 console.log('Change found');
                 setTemperature(currentTemp);
             }
-        //    if not - use lastConfigOfDay
+            //    if not - use lastConfigOfDay
         } else {
             if (previousTime !== lastTimeOfDay || currentTemp !== lastTempOfDay) {
                 previousTime = lastTimeOfDay;
@@ -165,20 +171,40 @@ function updateTime() {
     currentTime = hours + ':' + minutes;
 }
 
+function updateBoost() {
+    BoostConfig.findOne().exec(function (err, result) {
+        if (err) throw err;
+        var durationInMin = result.duration;
+        var duration = Date.now() - durationInMin * 60 * 1000;
+        Boost.findOne({time: {$gt: duration}})
+            .sort({time: 'desc'})
+            .exec(function (err, boost) {
+                if (err) throw err;
+                currentBoost = boost;
+            });
+    });
+    if (currentBoost && currentTemp !== currentBoost.temperature) {
+        currentTemp = currentBoost.temperature;
+        console.log('Boost override temperature');
+        setTemperature(currentTemp);
+    }
+}
+
 function everyMinute() {
     updateTime();
     // update of last configuration at end of the day
-    if(currentTime === '23:59')
+    if (currentTime === '23:59')
         updateLastConfigOfDay();
     // setting proper temperature to servo motor
-    if(/^[0-9][0-9]:[0-9]5$/.test(currentTime))
+    if (/^[0-9][0-9]:[0-9]5$/.test(currentTime))
         everyTenMinutesCheck();
+    updateBoost();
     updatePreviousConfig();
     setTimeout(printInfo, 3000);
     setTimeout(writeCurrentTempToDB, 4000);
 }
 
-function everyTenMinutesCheck(){
+function everyTenMinutesCheck() {
     console.log('Executing every-ten-minutes check.');
     setTemperature(currentTemp);
 }
