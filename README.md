@@ -17,6 +17,7 @@ Code hosted on [GitHub repository](https://github.com/viktor255/Kotol-Javascript
 ### How to run:
 
  - to start script run 'sudo nodejs kotol.js' - do not forget sudo
+ - in my case use pm2 daemon process manager 'sudo pm2 list'
 
 
 ### Project structure:
